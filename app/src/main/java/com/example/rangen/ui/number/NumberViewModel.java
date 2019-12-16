@@ -8,6 +8,7 @@ import java.util.Random;
 
 public class NumberViewModel extends ViewModel {
     // TODO: Implement the ViewModel
+    //Comment to check commit 3
     public int min, max;
     String rand = "", history1 = "", history2 = "";
 
