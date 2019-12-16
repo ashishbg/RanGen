@@ -27,52 +27,57 @@ public class NumberFragment extends Fragment {
 
     private NumberViewModel mViewModel;
 
-    Button generateNum;
-    TextView newNum, history1, history2;
-    EditText rangeMin, rangeMax;
+    Button generateNumBtn;
+    TextView newNumTv, history1Tv, history2Tv;
+    EditText rangeMinEt, rangeMaxEt;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
         final View root = inflater.inflate(R.layout.number_fragment, container, false);
-        ;
 
-        Log.d(TAG, "onCreateView: started");
+        mViewModel = ViewModelProviders.of(this).get(NumberViewModel.class);
 
-        generateNum = root.findViewById(R.id.btn_gen_num);
-        newNum = root.findViewById(R.id.new_number);
-        history1 = root.findViewById(R.id.number_history_1);
-        history2 = root.findViewById(R.id.number_history_2);
+        generateNumBtn = root.findViewById(R.id.btn_gen_num);
+        newNumTv = root.findViewById(R.id.new_number);
+        history1Tv = root.findViewById(R.id.number_history_1);
+        history2Tv = root.findViewById(R.id.number_history_2);
+        rangeMinEt = root.findViewById(R.id.range_min_et);
+        rangeMaxEt = root.findViewById(R.id.range_max_et);
 
-        rangeMin = root.findViewById(R.id.range_min_et);
-        rangeMax = root.findViewById(R.id.range_max_et);
-
-        generateNum.setOnClickListener(new View.OnClickListener() {
+        generateNumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int min, max, rand;
 
-                String minStr = rangeMin.getText().toString();
-                String maxStr = rangeMax.getText().toString();
+                String minStr = rangeMinEt.getText().toString();
+                String maxStr = rangeMaxEt.getText().toString();
 
-                min = Integer.parseInt(minStr);
-                max = Integer.parseInt(maxStr);
+                mViewModel.min = Integer.parseInt(minStr);
+                mViewModel.max = Integer.parseInt(maxStr);
 
-                history2.setText(history1.getText().toString());
-                history1.setText(newNum.getText().toString());
                 try {
-                    rand = getRandomNumberInRange(min, max);
-                    newNum.setText(String.valueOf(rand));
+                    mViewModel.generateRandomNumberInRange();
+                    newNumTv.setText(mViewModel.rand);
                 } catch (IllegalArgumentException e) {
-                    Snackbar snackbar = Snackbar.make(root, "Min greater than Max", Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(root, "Min greater than or equal to Max", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
-
+                history1Tv.setText(mViewModel.history1);
+                history2Tv.setText(mViewModel.history2);
             }
         });
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        newNumTv.setText(mViewModel.rand);
+        history1Tv.setText(mViewModel.history1);
+        history2Tv.setText(mViewModel.history2);
     }
 
     @Override
@@ -81,17 +86,4 @@ public class NumberFragment extends Fragment {
         mViewModel = ViewModelProviders.of(this).get(NumberViewModel.class);
         // TODO: Use the ViewModel
     }
-
-    private int getRandomNumberInRange(int min, int max) {
-
-        if (min >= max) {
-            Log.d("", "getRandomNumberInRange: max < min");
-            throw new IllegalArgumentException("max must be greater than min");
-        }
-
-        Random r = new Random();
-        int rand = r.nextInt((max - min) + 1) + min;
-        return rand;
-    }
-
 }
